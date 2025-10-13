@@ -1,5 +1,4 @@
 //go:build benchmarks
-//go:build benchmarks
 
 package benchmarks_test
 
