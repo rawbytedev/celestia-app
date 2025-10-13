@@ -19,7 +19,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const blockTime = time.Duration(6 * time.Second)
 
 func TradBenchmarkCheckTx_MsgSend_1(b *testing.B) {
 	testApp, rawTxs := generateMsgSendTransactions(b, 1)
@@ -43,7 +42,7 @@ func TradBenchmarkCheckTx_MsgSend_1(b *testing.B) {
 
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.CheckTx(&checkTxReq)
+		_, err := testApp.CheckTx(&checkTxReq)
 		require.NoError(b, err)
 	}
 
@@ -72,7 +71,7 @@ func TradBenchmarkCheckTx_MsgSend_8MB(b *testing.B) {
 		}
 		b.ReportAllocs()
 		for b.Loop() {
-			resp, err := testApp.CheckTx(&checkTxRequest)
+			_, err := testApp.CheckTx(&checkTxRequest)
 			require.NoError(b, err)
 		}
 	}
@@ -89,7 +88,7 @@ func TradBenchmarkFinalizeBlock_MsgSend_1(b *testing.B) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.FinalizeBlock(&finalizeBlockReq)
+		_, err := testApp.FinalizeBlock(&finalizeBlockReq)
 		require.NoError(b, err)
 	}
 }
@@ -105,7 +104,7 @@ func TradBenchmarkFinalizeBlock_MsgSend_8MB(b *testing.B) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.FinalizeBlock(&finalizeBlockReq)
+		_, err := testApp.FinalizeBlock(&finalizeBlockReq)
 		require.NoError(b, err)
 	}
 
@@ -121,7 +120,7 @@ func TradBenchmarkPrepareProposal_MsgSend_1(b *testing.B) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.PrepareProposal(&prepareProposalReq)
+		_, err := testApp.PrepareProposal(&prepareProposalReq)
 		require.NoError(b, err)
 	}
 }
@@ -137,7 +136,7 @@ func TradBenchmarkPrepareProposal_MsgSend_8MB(b *testing.B) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.PrepareProposal(&prepareProposalReq)
+		_, err := testApp.PrepareProposal(&prepareProposalReq)
 		require.NoError(b, err)
 	}
 }
@@ -162,7 +161,7 @@ func TradBenchmarkProcessProposal_MsgSend_1(b *testing.B) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.ProcessProposal(&processProposalReq)
+		_, err := testApp.ProcessProposal(&processProposalReq)
 		require.NoError(b, err)
 	}
 }
@@ -189,7 +188,7 @@ func TradBenchmarkProcessProposal_MsgSend_8MB(b *testing.B) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.ProcessProposal(&processProposalReq)
+		_, err := testApp.ProcessProposal(&processProposalReq)
 		require.NoError(b, err)
 	}
 }

@@ -48,7 +48,7 @@ func TradbenchmarkIBCCheckTxUpdateClient(b *testing.B, numberOfValidators int) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.CheckTx(&checkTxReq)
+		_, err := testApp.CheckTx(&checkTxReq)
 		require.NoError(b, err)
 	}
 }
@@ -91,7 +91,7 @@ func TradbenchmarkIBCFinalizeBlockUpdateClient(b *testing.B, numberOfValidators 
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.FinalizeBlock(&finalizeBlockReq)
+		_, err := testApp.FinalizeBlock(&finalizeBlockReq)
 		require.NoError(b, err)
 	}
 }
@@ -184,8 +184,7 @@ func TradbenchmarkIBCProcessProposalUpdateClient(b *testing.B, numberOfValidator
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.ProcessProposal(&processProposalReq)
+		_, err := testApp.ProcessProposal(&processProposalReq)
 		require.NoError(b, err)
 	}
 }
-

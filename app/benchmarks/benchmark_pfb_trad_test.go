@@ -69,7 +69,7 @@ func TradbenchmarkCheckTxPFB(b *testing.B, size int) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.CheckTx(&checkTxRequest)
+		_, err := testApp.CheckTx(&checkTxRequest)
 		require.NoError(b, err)
 	}
 }
@@ -118,7 +118,7 @@ func TradbenchmarkFinalizeBlockPFB(b *testing.B, size int) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.FinalizeBlock(&finalizeBlockReq)
+		_, err := testApp.FinalizeBlock(&finalizeBlockReq)
 		require.NoError(b, err)
 	}
 }
@@ -215,8 +215,7 @@ func TradbenchmarkProcessProposalPFB(b *testing.B, count, size int) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		resp, err := testApp.ProcessProposal(&processProposalReq)
+		_, err := testApp.ProcessProposal(&processProposalReq)
 		require.NoError(b, err)
 	}
 }
-
