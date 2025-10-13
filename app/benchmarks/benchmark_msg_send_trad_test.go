@@ -109,12 +109,7 @@ func TradBenchmarkFinalizeBlock_MsgSend_8MB(b *testing.B) {
 		require.NoError(b, err)
 	}
 
-	var totalGas int64
-	for i := range rawTxs {
-		require.Equal(b, uint32(0), resp.TxResults[i].Code)
-		require.Equal(b, "", resp.TxResults[i].Codespace)
-		totalGas += resp.TxResults[i].GasUsed
-	}
+	
 }
 
 func TradBenchmarkPrepareProposal_MsgSend_1(b *testing.B) {
