@@ -1,4 +1,4 @@
-//go:build benchmarks
+//go:build Tradbenchmarks
 
 package benchmarks_test
 
@@ -44,9 +44,12 @@ func BenchmarkTradCheckTx_MsgSend_1(b *testing.B) {
 	}
 
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.CheckTx(&checkTxReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 
 }
@@ -61,9 +64,12 @@ func BenchmarkTradFinalizeBlock_MsgSend_1(b *testing.B) {
 		Txs:    rawTxs,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.FinalizeBlock(&finalizeBlockReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
@@ -77,9 +83,12 @@ func BenchmarkTradFinalizeBlock_MsgSend_8MB(b *testing.B) {
 		Txs:    rawTxs,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.FinalizeBlock(&finalizeBlockReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 
 }
@@ -92,9 +101,12 @@ func BenchmarkTradPrepareProposal_MsgSend_1(b *testing.B) {
 		Height: testApp.LastBlockHeight() + 1,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.PrepareProposal(&prepareProposalReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
@@ -108,9 +120,12 @@ func BenchmarkTradPrepareProposal_MsgSend_8MB(b *testing.B) {
 		Height: testApp.LastBlockHeight() + 1,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.PrepareProposal(&prepareProposalReq)
+		b.StartTimer()
 		require.NoError(b, err)
+		b.StopTimer()
 	}
 }
 
@@ -133,9 +148,12 @@ func BenchmarkTradProcessProposal_MsgSend_1(b *testing.B) {
 		SquareSize:   1,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.ProcessProposal(&processProposalReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
@@ -160,9 +178,12 @@ func BenchmarkTradProcessProposal_MsgSend_8MB(b *testing.B) {
 		SquareSize:   128,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.ProcessProposal(&processProposalReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
