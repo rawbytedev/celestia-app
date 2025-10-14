@@ -1,4 +1,4 @@
-//go:build benchmarks
+//go:build Tradbenchmarks
 
 package benchmarks_test
 
@@ -74,9 +74,12 @@ func benchmarkTradCheckTx_PFB(b *testing.B, size int) {
 		Type: types.CheckTxType_New,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.CheckTx(&checkTxRequest)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
@@ -123,9 +126,12 @@ func benchmarkTradFinalizeBlock_PFB(b *testing.B, size int) {
 		Txs:    [][]byte{blobTx.Tx},
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.FinalizeBlock(&finalizeBlockReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
@@ -166,9 +172,12 @@ func benchmarkTradPrepareProposal_PFB(b *testing.B, count, size int) {
 		Height: testApp.LastBlockHeight() + 1,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.PrepareProposal(&prepareProposalReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
@@ -220,9 +229,12 @@ func benchmarkTradProcessProposal_PFB(b *testing.B, count, size int) {
 		SquareSize:   prepareProposalResp.SquareSize,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.ProcessProposal(&processProposalReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
