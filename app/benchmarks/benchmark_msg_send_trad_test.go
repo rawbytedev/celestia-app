@@ -51,34 +51,6 @@ func BenchmarkTradCheckTx_MsgSend_1(b *testing.B) {
 
 }
 
-func BenchmarkTradCheckTx_MsgSend_8MB(b *testing.B) {
-	testApp, rawTxs := generateMsgSendTransactions(b, 31645)
-
-	finalizeBlockResp, err := testApp.FinalizeBlock(&types.RequestFinalizeBlock{
-		Time:   testutil.GenesisTime.Add(blockTime),
-		Height: testApp.LastBlockHeight() + 1,
-		Hash:   testApp.LastCommitID().Hash,
-	})
-	require.NotNil(b, finalizeBlockResp)
-	require.NoError(b, err)
-
-	commitResp, err := testApp.Commit()
-	require.NotNil(b, commitResp)
-	require.NoError(b, err)
-
-	for _, tx := range rawTxs {
-		checkTxRequest := types.RequestCheckTx{
-			Tx:   tx,
-			Type: types.CheckTxType_New,
-		}
-		b.ReportAllocs()
-		for b.Loop() {
-			_, err := testApp.CheckTx(&checkTxRequest)
-			require.NoError(b, err)
-		}
-	}
-}
-
 func BenchmarkTradFinalizeBlock_MsgSend_1(b *testing.B) {
 	testApp, rawTxs := generateMsgSendTransactions(b, 1)
 
