@@ -49,7 +49,7 @@ func BenchmarkTradCheckTx_PFB_Multi(b *testing.B) {
 	}
 	for _, testCase := range testCases {
 		b.Run(fmt.Sprintf("%d bytes", testCase.blobSize), func(b *testing.B) {
-			TradbenchmarkCheckTxPFB(b, testCase.blobSize)
+			BenchmarkTradCheckTx_PFB(b, testCase.blobSize)
 		})
 	}
 }
