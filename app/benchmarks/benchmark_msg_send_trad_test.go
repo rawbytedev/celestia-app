@@ -21,7 +21,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const blockTime = time.Duration(6 * time.Second)
 
 func BenchmarkTradCheckTx_MsgSend_1(b *testing.B) {
 	testApp, rawTxs := generateMsgSendTransactions(b, 1)
