@@ -5,23 +5,29 @@ package benchmarks_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"cosmossdk.io/log"
-	
-	
-	
+
+	"github.com/celestiaorg/celestia-app/v6/app"
+	"github.com/celestiaorg/celestia-app/v6/app/encoding"
+	"github.com/celestiaorg/celestia-app/v6/pkg/user"
 	testutil "github.com/celestiaorg/celestia-app/v6/test/util"
-	
-	
+	"github.com/celestiaorg/celestia-app/v6/test/util/testfactory"
+
+	"github.com/celestiaorg/go-square/v3/share"
 	blobtx "github.com/celestiaorg/go-square/v3/tx"
 	"github.com/cometbft/cometbft/abci/types"
-	
+	"github.com/cometbft/cometbft/crypto"
+
 	"github.com/stretchr/testify/require"
 )
 
 func init() {
 	testutil.TestAppLogger = log.NewNopLogger()
 }
+
+const blockTime = time.Duration(6 * time.Second)
 
 func TradBenchmarkCheckTx_PFB_Multi(b *testing.B) {
 	testCases := []struct {
@@ -218,4 +224,31 @@ func TradbenchmarkProcessProposalPFB(b *testing.B, count, size int) {
 		_, err := testApp.ProcessProposal(&processProposalReq)
 		require.NoError(b, err)
 	}
+}
+
+// generatePayForBlobTransactions creates a test app then generates a number
+// of valid PFB transactions.
+func generatePayForBlobTransactions(b *testing.B, count, size int) (*app.App, [][]byte) {
+	account := "test"
+	testApp, kr := testutil.SetupTestAppWithGenesisValSetAndMaxSquareSize(app.DefaultConsensusParams(), 128, account)
+	addr := testfactory.GetAddress(kr, account)
+	enc := encoding.MakeConfig(app.ModuleEncodingRegisters...)
+	acc := testutil.DirectQueryAccount(testApp, addr)
+	accountSequence := acc.GetSequence()
+	signer, err := user.NewSigner(kr, enc.TxConfig, testutil.ChainID, user.NewAccount(account, acc.GetAccountNumber(), acc.GetSequence()))
+	require.NoError(b, err)
+
+	rawTxs := make([][]byte, 0, count)
+	randomBytes := crypto.CRandBytes(size)
+	blob, err := share.NewBlob(share.RandomNamespace(), randomBytes, 1, acc.GetAddress().Bytes())
+	require.NoError(b, err)
+	for i := 0; i < count; i++ {
+		tx, _, err := signer.CreatePayForBlobs(account, []*share.Blob{blob}, user.SetGasLimit(2549760000), user.SetFee(10000))
+		require.NoError(b, err)
+		rawTxs = append(rawTxs, tx)
+		accountSequence++
+		err = signer.SetSequence(account, accountSequence)
+		require.NoError(b, err)
+	}
+	return testApp, rawTxs
 }
