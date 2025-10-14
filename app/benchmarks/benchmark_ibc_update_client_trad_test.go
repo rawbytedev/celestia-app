@@ -5,6 +5,7 @@ package benchmarks_test
 import (
 	"fmt"
 	"testing"
+	"time"
 	"github.com/celestiaorg/celestia-app/v6/app"
 	"github.com/celestiaorg/celestia-app/v6/app/encoding"
 	"github.com/celestiaorg/celestia-app/v6/pkg/appconsts"
