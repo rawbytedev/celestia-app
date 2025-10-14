@@ -4,15 +4,13 @@ package benchmarks_test
 
 import (
 	"testing"
-	"time"
+	
 
-	"github.com/celestiaorg/celestia-app/v6/app"
-	"github.com/celestiaorg/celestia-app/v6/app/encoding"
-	"github.com/celestiaorg/celestia-app/v6/pkg/appconsts"
-	"github.com/celestiaorg/celestia-app/v6/pkg/user"
+	
+	
+	
 	testutil "github.com/celestiaorg/celestia-app/v6/test/util"
-	"github.com/celestiaorg/celestia-app/v6/test/util/testfactory"
-	"github.com/celestiaorg/celestia-app/v6/test/util/testnode"
+
 	"github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -63,7 +61,7 @@ func TradBenchmarkCheckTx_MsgSend_8MB(b *testing.B) {
 	require.NotNil(b, commitResp)
 	require.NoError(b, err)
 
-	var totalGas int64
+	
 	for _, tx := range rawTxs {
 		checkTxRequest := types.RequestCheckTx{
 			Tx:   tx,

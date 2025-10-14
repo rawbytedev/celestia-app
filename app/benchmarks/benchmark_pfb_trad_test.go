@@ -161,7 +161,7 @@ func TradbenchmarkPrepareProposalPFB(b *testing.B, count, size int) {
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		prepareProposalResp, err := testApp.PrepareProposal(&prepareProposalReq)
+		_, err := testApp.PrepareProposal(&prepareProposalReq)
 		require.NoError(b, err)
 	}
 }

@@ -132,7 +132,7 @@ func TradbenchmarkIBCPrepareProposalUpdateClient(b *testing.B, numberOfValidator
 	}
 	b.ReportAllocs()
 	for b.Loop() {
-		prepareProposalResp, err := testApp.PrepareProposal(&prepareProposalReq)
+		_, err := testApp.PrepareProposal(&prepareProposalReq)
 		require.NoError(b, err)
 	}
 }
