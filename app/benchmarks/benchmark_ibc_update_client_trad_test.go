@@ -47,9 +47,12 @@ func benchmarkTradIBCCheckTxUpdateClient(b *testing.B, numberOfValidators int) {
 		Tx:   rawTxs[0],
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.CheckTx(&checkTxReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
@@ -90,9 +93,12 @@ func benchmarkTradIBCFinalizeBlockUpdateClient(b *testing.B, numberOfValidators 
 		Txs:    rawTxs,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.FinalizeBlock(&finalizeBlockReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
@@ -131,9 +137,12 @@ func benchmarkTradIBCPrepareProposalUpdateClient(b *testing.B, numberOfValidator
 		Height: testApp.LastBlockHeight() + 1,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.PrepareProposal(&prepareProposalReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
 
@@ -183,8 +192,11 @@ func benchmarkTradIBCProcessProposalUpdateClient(b *testing.B, numberOfValidator
 		SquareSize:   prepareProposalResp.SquareSize,
 	}
 	b.ReportAllocs()
-	for b.Loop() {
+	b.ResetTimer()
+    for i := 0; i < b.N; i++ {
 		_, err := testApp.ProcessProposal(&processProposalReq)
+		b.StopTimer()
 		require.NoError(b, err)
+		b.StartTimer()
 	}
 }
