@@ -22,8 +22,4 @@ jobs:
           go-version: "1.24"
 
       - name: PFB Bench
-        run: go test -v -tags=benchmarks -bench=. -run=^$ ./app/benchmarks/benchmark_pfb_trad_test.go
-      - name: MSG send Bench
-        run: go test -v -tags=benchmarks -bench=. -run=^$ ./app/benchmarks/benchmark_msg_send_trad_test.go
-      - name: IBC client Bench
-        run: go test -v -tags=benchmarks -bench=. -run=^$ ./app/benchmarks/benchmark_ibc_update_client_trad_test.go
+        run: go test -v -tags=Tradbenchmarks -bench=. -run=^$ ./app/benchmarks/...
