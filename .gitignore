@@ -32,3 +32,5 @@ config.json
 memory-bank/*
 .clinerules
 tools/talis/talis
+app/benchmarks/list.txt
+.gitignore

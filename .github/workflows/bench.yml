@@ -2,9 +2,9 @@ name: Run Go Tests
 
 on:
   push:
-    branches: [ "main" , "test", "testbench"]
+    branches: [ "main" , "testing", "testbench"]
   pull_request:
-    branches: [ "main", "test"," testbench"]
+    branches: [ "main", "testing"," testbench"]
 
 jobs:
   test:
@@ -21,5 +21,35 @@ jobs:
         with:
           go-version: "1.24"
 
-      - name: Run tests
-        run: go test -run=^$ -bench . ./app/benchmarks/*test.go
+      - name: CheckTx bench1
+        run: go test -tags=benchmarks -bench=TradBenchmarkCheckTx_PFB_Multi ./app/benchmarks/...
+      
+      - name: CheckTx bench2
+        run: go test -tags=benchmarks -bench=TradBenchmarkFinalizeBlock_PFB_Multi ./app/benchmarks/...
+      
+      - name: CheckTx bench3
+        run: go test -tags=benchmarks -bench=TradBenchmarkPrepareProposal_PFB_Multi ./app/benchmarks/...
+      
+      - name: CheckTx bench4
+        run: go test -tags=benchmarks -bench=TradBenchmarkProcessProposal_PFB_Multi ./app/benchmarks/...
+      
+      - name: CheckTx bench5
+        run: go test -tags=benchmarks -bench=TradBenchmarkCheckTx_MsgSend_1 ./app/benchmarks/...
+      
+      - name: CheckTx bench6
+        run: go test -tags=benchmarks -bench=TradBenchmarkFinalizeBlock_MsgSend_1 ./app/benchmarks/...
+      
+      - name: CheckTx bench7
+        run: go test -tags=benchmarks -bench=TradBenchmarkPrepareProposal_MsgSend_1 ./app/benchmarks/...
+      
+      - name: CheckTx bench8
+        run: go test -tags=benchmarks -bench=TradBenchmarkProcessProposal_MsgSend_1 ./app/benchmarks/...
+      
+      - name: CheckTx bench9
+        run: go test -tags=benchmarks -bench=TradBenchmarkIBC_CheckTx_Update_Client_Multi ./app/benchmarks/...
+      
+      - name: CheckTx bench10
+        run: go test -tags=benchmarks -bench=TradBenchmarkIBC_PrepareProposal_Update_Client_Multi ./app/benchmarks/...
+      
+      - name: CheckTx bench11
+        run: go test -tags=benchmarks -bench=TradBenchmarkIBC_ProcessProposal_Update_Client_Multi ./app/benchmarks/...
