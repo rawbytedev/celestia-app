@@ -49,12 +49,12 @@ func BenchmarkTradCheckTx_PFB_Multi(b *testing.B) {
 	}
 	for _, testCase := range testCases {
 		b.Run(fmt.Sprintf("%d bytes", testCase.blobSize), func(b *testing.B) {
-			BenchmarkTradCheckTx_PFB(b, testCase.blobSize)
+			benchmarkTradCheckTx_PFB(b, testCase.blobSize)
 		})
 	}
 }
 
-func BenchmarkTradCheckTx_PFB(b *testing.B, size int) {
+func benchmarkTradCheckTx_PFB(b *testing.B, size int) {
 	testApp, rawTxs := generatePayForBlobTransactions(b, 1, size)
 
 	finalizeBlockResp, err := testApp.FinalizeBlock(&types.RequestFinalizeBlock{
@@ -104,12 +104,12 @@ func BenchmarkTradFinalizeBlock_PFB_Multi(b *testing.B) {
 	}
 	for _, testCase := range testCases {
 		b.Run(fmt.Sprintf("%d bytes", testCase.blobSize), func(b *testing.B) {
-			BenchmarkTradFinalizeBlock_PFB(b, testCase.blobSize)
+			benchmarkTradFinalizeBlock_PFB(b, testCase.blobSize)
 		})
 	}
 }
 
-func BenchmarkTradFinalizeBlock_PFB(b *testing.B, size int) {
+func benchmarkTradFinalizeBlock_PFB(b *testing.B, size int) {
 	testApp, rawTxs := generatePayForBlobTransactions(b, 1, size)
 
 	blobTx, ok, err := blobtx.UnmarshalBlobTx(rawTxs[0])
@@ -153,12 +153,12 @@ func BenchmarkTradPrepareProposal_PFB_Multi(b *testing.B) {
 	}
 	for _, testCase := range testCases {
 		b.Run(fmt.Sprintf("%d transactions of %d bytes", testCase.numberOfTransactions, testCase.blobSize), func(b *testing.B) {
-			BenchmarkTradPrepareProposal_PFB(b, testCase.numberOfTransactions, testCase.blobSize)
+			benchmarkTradPrepareProposal_PFB(b, testCase.numberOfTransactions, testCase.blobSize)
 		})
 	}
 }
 
-func BenchmarkTradPrepareProposal_PFB(b *testing.B, count, size int) {
+func benchmarkTradPrepareProposal_PFB(b *testing.B, count, size int) {
 	testApp, rawTxs := generatePayForBlobTransactions(b, count, size)
 
 	prepareProposalReq := types.RequestPrepareProposal{
@@ -196,12 +196,12 @@ func BenchmarkTradProcessProposal_PFB_Multi(b *testing.B) {
 	}
 	for _, testCase := range testCases {
 		b.Run(fmt.Sprintf("%d transactions of %d bytes", testCase.numberOfTransactions, testCase.blobSize), func(b *testing.B) {
-			BenchmarkTradProcessProposal_PFB(b, testCase.numberOfTransactions, testCase.blobSize)
+			benchmarkTradProcessProposal_PFB(b, testCase.numberOfTransactions, testCase.blobSize)
 		})
 	}
 }
 
-func BenchmarkTradProcessProposal_PFB(b *testing.B, count, size int) {
+func benchmarkTradProcessProposal_PFB(b *testing.B, count, size int) {
 	testApp, rawTxs := generatePayForBlobTransactions(b, count, size)
 
 	prepareProposalReq := types.RequestPrepareProposal{

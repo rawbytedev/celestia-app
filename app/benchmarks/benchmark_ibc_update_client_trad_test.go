@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TradBenchmarkIBC_CheckTx_Update_Client_Multi(b *testing.B) {
+func BenchmarkTradIBC_CheckTx_Update_Client_Multi(b *testing.B) {
 	testCases := []struct {
 		numberOfValidators int
 	}{
@@ -33,12 +33,12 @@ func TradBenchmarkIBC_CheckTx_Update_Client_Multi(b *testing.B) {
 	}
 	for _, testCase := range testCases {
 		b.Run(fmt.Sprintf("number of validators: %d", testCase.numberOfValidators), func(b *testing.B) {
-			TradbenchmarkIBCCheckTxUpdateClient(b, testCase.numberOfValidators)
+			benchmarkTradIBCCheckTxUpdateClient(b, testCase.numberOfValidators)
 		})
 	}
 }
 
-func TradbenchmarkIBCCheckTxUpdateClient(b *testing.B, numberOfValidators int) {
+func benchmarkTradIBCCheckTxUpdateClient(b *testing.B, numberOfValidators int) {
 	testApp, rawTxs := generateIBCUpdateClientTransaction(b, numberOfValidators, 1, 1)
 	testApp.Commit()
 
@@ -53,7 +53,7 @@ func TradbenchmarkIBCCheckTxUpdateClient(b *testing.B, numberOfValidators int) {
 	}
 }
 
-func TradBenchmarkIBC_FinalizeBlock_Update_Client_Multi(b *testing.B) {
+func BenchmarkTradIBC_FinalizeBlock_Update_Client_Multi(b *testing.B) {
 	testCases := []struct {
 		numberOfValidators int
 	}{
@@ -75,12 +75,12 @@ func TradBenchmarkIBC_FinalizeBlock_Update_Client_Multi(b *testing.B) {
 	}
 	for _, testCase := range testCases {
 		b.Run(fmt.Sprintf("number of validators: %d", testCase.numberOfValidators), func(b *testing.B) {
-			TradbenchmarkIBCFinalizeBlockUpdateClient(b, testCase.numberOfValidators)
+			benchmarkTradIBCFinalizeBlockUpdateClient(b, testCase.numberOfValidators)
 		})
 	}
 }
 
-func TradbenchmarkIBCFinalizeBlockUpdateClient(b *testing.B, numberOfValidators int) {
+func benchmarkTradIBCFinalizeBlockUpdateClient(b *testing.B, numberOfValidators int) {
 	testApp, rawTxs := generateIBCUpdateClientTransaction(b, numberOfValidators, 1, 1)
 
 	finalizeBlockReq := types.RequestFinalizeBlock{
@@ -96,7 +96,7 @@ func TradbenchmarkIBCFinalizeBlockUpdateClient(b *testing.B, numberOfValidators 
 	}
 }
 
-func TradBenchmarkIBC_PrepareProposal_Update_Client_Multi(b *testing.B) {
+func BenchmarkTradIBC_PrepareProposal_Update_Client_Multi(b *testing.B) {
 	testCases := []struct {
 		numberOfTransactions, numberOfValidators int
 	}{
@@ -118,12 +118,12 @@ func TradBenchmarkIBC_PrepareProposal_Update_Client_Multi(b *testing.B) {
 	}
 	for _, testCase := range testCases {
 		b.Run(fmt.Sprintf("number of validators: %d", testCase.numberOfValidators), func(b *testing.B) {
-			TradbenchmarkIBCPrepareProposalUpdateClient(b, testCase.numberOfValidators, testCase.numberOfTransactions)
+			benchmarkTradIBCPrepareProposalUpdateClient(b, testCase.numberOfValidators, testCase.numberOfTransactions)
 		})
 	}
 }
 
-func TradbenchmarkIBCPrepareProposalUpdateClient(b *testing.B, numberOfValidators, count int) {
+func benchmarkTradIBCPrepareProposalUpdateClient(b *testing.B, numberOfValidators, count int) {
 	testApp, rawTxs := generateIBCUpdateClientTransaction(b, numberOfValidators, count, count)
 
 	prepareProposalReq := types.RequestPrepareProposal{
@@ -137,7 +137,7 @@ func TradbenchmarkIBCPrepareProposalUpdateClient(b *testing.B, numberOfValidator
 	}
 }
 
-func TradBenchmarkIBC_ProcessProposal_Update_Client_Multi(b *testing.B) {
+func BenchmarkTradIBC_ProcessProposal_Update_Client_Multi(b *testing.B) {
 	testCases := []struct {
 		numberOfTransactions, numberOfValidators int
 	}{
@@ -159,12 +159,12 @@ func TradBenchmarkIBC_ProcessProposal_Update_Client_Multi(b *testing.B) {
 	}
 	for _, testCase := range testCases {
 		b.Run(fmt.Sprintf("number of validators: %d", testCase.numberOfValidators), func(b *testing.B) {
-			TradbenchmarkIBCProcessProposalUpdateClient(b, testCase.numberOfValidators, testCase.numberOfTransactions)
+			benchmarkTradIBCProcessProposalUpdateClient(b, testCase.numberOfValidators, testCase.numberOfTransactions)
 		})
 	}
 }
 
-func TradbenchmarkIBCProcessProposalUpdateClient(b *testing.B, numberOfValidators, count int) {
+func benchmarkTradIBCProcessProposalUpdateClient(b *testing.B, numberOfValidators, count int) {
 	testApp, rawTxs := generateIBCUpdateClientTransaction(b, numberOfValidators, count, count)
 
 	prepareProposalReq := types.RequestPrepareProposal{
