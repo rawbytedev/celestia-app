@@ -2,9 +2,9 @@ name: Run Go Tests
 
 on:
   push:
-    branches: [ "main" , "testing", "testbench"]
+    branches: [ "main" , "testingbench", "testbench"]
   pull_request:
-    branches: [ "main", "testing"," testbench"]
+    branches: [ "main", "testingbench"," testbench"]
 
 jobs:
   test:
