@@ -7,15 +7,15 @@ import (
 	"testing"
 
 	"cosmossdk.io/log"
-	"github.com/celestiaorg/celestia-app/v6/app"
-	"github.com/celestiaorg/celestia-app/v6/app/encoding"
-	"github.com/celestiaorg/celestia-app/v6/pkg/user"
+	
+	
+	
 	testutil "github.com/celestiaorg/celestia-app/v6/test/util"
-	"github.com/celestiaorg/celestia-app/v6/test/util/testfactory"
-	"github.com/celestiaorg/go-square/v3/share"
+	
+	
 	blobtx "github.com/celestiaorg/go-square/v3/tx"
 	"github.com/cometbft/cometbft/abci/types"
-	"github.com/cometbft/cometbft/crypto"
+	
 	"github.com/stretchr/testify/require"
 )
 
