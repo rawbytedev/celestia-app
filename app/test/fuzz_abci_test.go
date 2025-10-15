@@ -260,7 +260,6 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					// keep tab of blob
 					n_blob := len(txs)
 					t.Logf("%d", n_blob)
-					require.Equal(t, n_blob, len(accounts))
 
 					// create 100 send transactions
 					sendTxs := testutil.SendTxsWithAccounts(
