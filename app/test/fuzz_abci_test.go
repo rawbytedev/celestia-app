@@ -274,8 +274,8 @@ func TestPrepareProposalInclusion(t *testing.T) {
 						testutil.ChainID,
 						user.SetGasLimitAndGasPrice(1_000_000, 0.1),
 					)
-					_ = sendTxs
-					//txs = append(txs, sendTxs...)
+					
+					txs = append(txs, sendTxs...)
 
 					blockTime := time.Now()
 					height := testApp.LastBlockHeight() + 1
@@ -305,7 +305,6 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					// should make it into the block. This should be expected to
 					// change if PFB transactions are not separated and put into
 					// their own namespace
-					t.Logf("number of transactions: %d",len(resp.Txs))
 					//require.GreaterOrEqual(t, len(resp.Txs), sendTxCount+1)
 					// at this point valid 100 valid txs and 1 blob
 					// we check the amount of blob that made it into block
@@ -317,7 +316,6 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					
 					valid_blob := len(resp.Txs) - sendTxCount
 					incl_rate := float64(valid_blob) / float64(n_blob)
-					t.Logf("sendtx count: %d",sendTxCount)
 					///* We need this to determine the min rate of included blob
 					t.Logf("included blob: %2.f %%", incl_rate)
 					//*/
