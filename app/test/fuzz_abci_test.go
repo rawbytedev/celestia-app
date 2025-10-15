@@ -192,14 +192,15 @@ func TestPrepareProposalInclusion(t *testing.T) {
 		iterations             int
 	}
 	tests := []test{
-		// running these tests more than once in CI will sometimes timeout, so we
-		// have to run them each once per square size. However, we can run these
-		// more locally by increasing the iterations.
-		{"many small single share single blob transactions", 1000, 1, 400, 1},
-		{"one hundred normal sized single blob transactions", 100, 1, 400000, 1},
-		{"many single share multi-blob transactions", 1000, 100, 400, 1},
-		{"one hundred normal sized multi-blob transactions", 100, 4, 400000, 1},
-	}
+    // list of test for Inclusion
+    {"deterministic small single-share single-blob transactions", 1000, 1, 256, 1},
+    {"one hundred small single-share single-blob transactions", 100, 1, 256, 1},
+    {"many small multi-blob transactions", 1000, 10, 256, 1},
+    {"inclusion threshold test with small blobs", 100, 1, 256, 80},
+    {"max tx count with minimal blob size", 2000, 1, 128, 1},
+    {"packing efficiency test", 500, 5, 512, 1},
+}
+
 
 	type testSize struct {
 		name             string
