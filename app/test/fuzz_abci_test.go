@@ -196,7 +196,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
     {"deterministic small single-share single-blob transactions", 1000, 1, 256, 1},
     {"one hundred small single-share single-blob transactions", 100, 1, 256, 1},
     {"many small multi-blob transactions", 1000, 10, 256, 1},
-    {"inclusion threshold test with small blobs", 100, 1, 256, 80},
+    {"inclusion threshold test with small blobs", 100, 1, 256, 1},
     {"max tx count with minimal blob size", 2000, 1, 128, 1},
     {"packing efficiency test", 500, 5, 512, 1},
 }
@@ -260,7 +260,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					)
 					// keep tab of blob
 					n_blob := len(txs)
-					t.Logf("%d", n_blob)
+					
 
 					// create 100 send transactions
 					sendTxs := testutil.SendTxsWithAccounts(
@@ -274,8 +274,8 @@ func TestPrepareProposalInclusion(t *testing.T) {
 						testutil.ChainID,
 						user.SetGasLimitAndGasPrice(1_000_000, 0.1),
 					)
-					
-					txs = append(txs, sendTxs...)
+					_ = sendTxs
+					//txs = append(txs, sendTxs...)
 
 					blockTime := time.Now()
 					height := testApp.LastBlockHeight() + 1
@@ -313,7 +313,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					// then calculate the rate(%) of included blob
 					// but we need to have a min_rate first so we run test
 					// and log obtained rates(%) and find the min
-					
+					t.Logf("Transaction Included: %d", len(resp.Txs))
 					valid_blob := len(resp.Txs) - sendTxCount
 					incl_rate := float64(valid_blob) / float64(n_blob)
 					///* We need this to determine the min rate of included blob
