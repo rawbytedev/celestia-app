@@ -193,8 +193,8 @@ func TestPrepareProposalInclusion(t *testing.T) {
 	}
 	tests := []test{
     // list of test for Inclusion
-	{"many single share multi-blob transactions", 1000, 100, 400, 1},
-	{"many small single share single blob transactions", 1000, 1, 400, 1},
+	{"many single share multi-blob transactions", 1000, 100, 256, 1},
+	{"many small single share single blob transactions", 1000, 1, 256, 1},
 }
 
 
