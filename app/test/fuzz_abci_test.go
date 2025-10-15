@@ -9,10 +9,15 @@ import (
 	"github.com/celestiaorg/celestia-app/v6/pkg/appconsts"
 	"github.com/celestiaorg/celestia-app/v6/pkg/user"
 	testutil "github.com/celestiaorg/celestia-app/v6/test/util"
+	"github.com/celestiaorg/celestia-app/v6/test/util/blobfactory"
 	"github.com/celestiaorg/celestia-app/v6/test/util/random"
+	"github.com/celestiaorg/celestia-app/v6/test/util/testfactory"
 	"github.com/celestiaorg/go-square/v3/share"
 	abci "github.com/cometbft/cometbft/abci/types"
+	"github.com/cometbft/cometbft/crypto"
 	coretypes "github.com/cometbft/cometbft/types"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/stretchr/testify/require"
 )
 
@@ -160,9 +165,7 @@ func TestPrepareProposalConsistency(t *testing.T) {
 					valid_blob := len(resp.Txs) - sendTxCount
 					incl_rate := float64(valid_blob) / float64(n_blob)
 					///* We need this to determine the min rate of included blob
-					t.Logf("Total included Txs: %d", len(resp.Txs))
-					t.Logf("Supposed included blob: %d / %d", valid_blob, n_blob)
-					t.Logf("included blob: %.2f %%", incl_rate*float64(100))
+					t.Logf("included blob: %2.f %%", incl_rate)
 					//*/
 					//min_rate := 50 / 100 // the min_rate goes here after testings
 					//require.GreaterOrEqual(t, min_rate, incl_rate)
@@ -170,4 +173,198 @@ func TestPrepareProposalConsistency(t *testing.T) {
 			})
 		}
 	}
+}
+
+func TestPrepareProposalInclusion(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping TestPrepareProposalInclusion in short mode.")
+	}
+	enc := encoding.MakeConfig(app.ModuleEncodingRegisters...)
+	accounts := make([]string, 1100) // 1000 for creating blob txs, 100 for creating send txs
+	for i := range accounts {
+		accounts[i] = random.Str(20)
+	}
+	maxShareCount := int64(appconsts.SquareSizeUpperBound * appconsts.SquareSizeUpperBound)
+
+	type test struct {
+		name                   string
+		count, blobCount, size int
+		iterations             int
+	}
+	tests := []test{
+		// running these tests more than once in CI will sometimes timeout, so we
+		// have to run them each once per square size. However, we can run these
+		// more locally by increasing the iterations.
+		{"many small single share single blob transactions", 1000, 1, 400, 1},
+		{"one hundred normal sized single blob transactions", 100, 1, 400000, 1},
+		{"many single share multi-blob transactions", 1000, 100, 400, 1},
+		{"one hundred normal sized multi-blob transactions", 100, 4, 400000, 1},
+	}
+
+	type testSize struct {
+		name             string
+		maxBytes         int64
+		govMaxSquareSize int
+	}
+	sizes := []testSize{
+		{
+			"default",
+			appconsts.DefaultMaxBytes,
+			appconsts.DefaultGovMaxSquareSize,
+		},
+		{
+			"max",
+			maxShareCount * share.ContinuationSparseShareContentSize,
+			appconsts.SquareSizeUpperBound,
+		},
+		{
+			"larger MaxBytes than SquareSize",
+			maxShareCount * share.ContinuationSparseShareContentSize,
+			appconsts.DefaultGovMaxSquareSize,
+		},
+		{
+			"smaller MaxBytes than SquareSize",
+			32 * 32 * share.ContinuationSparseShareContentSize,
+			appconsts.DefaultGovMaxSquareSize,
+		},
+	}
+
+	// run the above test case for each square size the specified number of
+	// iterations
+	for _, size := range sizes {
+		// setup a new application with different MaxBytes consensus parameter
+		// values.
+		cparams := app.DefaultConsensusParams()
+		cparams.Block.MaxBytes = size.maxBytes
+
+		testApp, kr := testutil.SetupTestAppWithGenesisValSet(cparams, accounts...)
+
+		sendTxCount := 100
+
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				// repeat and generate PFB each time
+				for i := 0; i < tt.iterations; i++ {
+					txs := generatePayForBlobTransactions(
+						t,
+						testApp,
+						enc.TxConfig,
+						kr,
+						tt.size,
+						tt.count,
+						true,
+						testutil.ChainID,
+						accounts[:tt.count],
+						user.SetGasLimitAndGasPrice(1_000_000_000, 0.1),
+					)
+					// keep tab of blob
+					n_blob := len(txs)
+					t.Logf("%d", n_blob)
+					require.Equal(t, n_blob, len(accounts))
+
+					// create 100 send transactions
+					sendTxs := testutil.SendTxsWithAccounts(
+						t,
+						testApp,
+						enc.TxConfig,
+						kr,
+						1000,
+						accounts[0],
+						accounts[len(accounts)-sendTxCount:],
+						testutil.ChainID,
+						user.SetGasLimitAndGasPrice(1_000_000, 0.1),
+					)
+					txs = append(txs, sendTxs...)
+
+					blockTime := time.Now()
+					height := testApp.LastBlockHeight() + 1
+
+					resp, err := testApp.PrepareProposal(&abci.RequestPrepareProposal{
+						Txs:    coretypes.Txs(txs).ToSliceOfBytes(),
+						Time:   blockTime,
+						Height: height,
+					})
+					require.NoError(t, err)
+
+					// check that the square size is smaller than or equal to
+					// the specified size
+					require.LessOrEqual(t, resp.SquareSize, uint64(size.govMaxSquareSize))
+
+					res, err := testApp.ProcessProposal(&abci.RequestProcessProposal{
+						Height:       height,
+						DataRootHash: resp.DataRootHash,
+						SquareSize:   resp.SquareSize,
+						Txs:          resp.Txs,
+					},
+					)
+					require.NoError(t, err)
+
+					require.Equal(t, abci.ResponseProcessProposal_ACCEPT, res.Status)
+					// At least all of the send transactions and one blob tx
+					// should make it into the block. This should be expected to
+					// change if PFB transactions are not separated and put into
+					// their own namespace
+					require.GreaterOrEqual(t, len(resp.Txs), sendTxCount+1)
+					// at this point valid 100 valid txs and 1 blob
+					// we check the amount of blob that made it into block
+
+					// We determine the number of included blob in block
+					// then calculate the rate(%) of included blob
+					// but we need to have a min_rate first so we run test
+					// and log obtained rates(%) and find the min
+					valid_blob := len(resp.Txs) - sendTxCount
+					incl_rate := float64(valid_blob) / float64(n_blob)
+					///* We need this to determine the min rate of included blob
+					t.Logf("included blob: %2.f %%", incl_rate)
+					//*/
+					//min_rate := 50 / 100 // the min_rate goes here after testings
+					//require.GreaterOrEqual(t, min_rate, incl_rate)
+				}
+			})
+		}
+	}
+}
+
+// generatePayForBlobTransactions creates a number of valid PFB txs
+// for accounts
+// We try to make sure it integrates nicely without breaking anything
+func generatePayForBlobTransactions(
+	t *testing.T,
+	testApp *app.App,
+	cfg client.TxConfig,
+	kr keyring.Keyring,
+	size int,
+	count int,
+	_ bool, // not sure about supporting randsize
+	chainid string,
+	accounts []string,
+	extraOpts ...user.TxOption,
+) []coretypes.Tx {
+	opts := append(blobfactory.DefaultTxOpts(), extraOpts...)
+	require.Greater(t, size, 0)
+	require.Greater(t, count, 0) // neeed to remove it
+	rawTxs := make([]coretypes.Tx, 0, len(accounts))
+	for i := range accounts {
+		addr := testfactory.GetAddress(kr, accounts[i])
+		acc := testutil.DirectQueryAccount(testApp, addr)
+		accountSequence := acc.GetSequence()
+		account := user.NewAccount(accounts[i], acc.GetAccountNumber(), accountSequence)
+		signer, err := user.NewSigner(kr, cfg, chainid, account)
+		require.NoError(t, err)
+		randomBytes := crypto.CRandBytes(size)
+		blobs := make([]*share.Blob, count)
+
+		for i := range count {
+			blob, err := share.NewBlob(share.RandomNamespace(), randomBytes, 1, acc.GetAddress().Bytes())
+			require.NoError(t, err)
+			blobs[i] = blob
+		}
+		// create blobs per account
+		tx, _, err := signer.CreatePayForBlobs(account.Name(), blobs, opts...)
+		require.NoError(t, err)
+		rawTxs = append(rawTxs, tx)
+
+	}
+
+	return rawTxs
 }
