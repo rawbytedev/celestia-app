@@ -195,7 +195,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
     // list of test for Inclusion
     {"one hundred normal sized single blob transactions", 100, 1, 400000, 1},
 	{"many single share multi-blob transactions", 1000, 100, 400, 1},
-	{"one hundred normal sized multi-blob transactions", 100, 4, 400000, 1}
+	{"one hundred normal sized multi-blob transactions", 100, 4, 400000, 1},
 }
 
 
