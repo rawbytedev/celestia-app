@@ -270,8 +270,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
 						testutil.ChainID,
 						user.SetGasLimitAndGasPrice(1_000_000, 0.1),
 					)
-					_ = sendTxs
-					//txs = append(txs, sendTxs...)
+					txs = append(txs, sendTxs...)
 
 					blockTime := time.Now()
 					height := testApp.LastBlockHeight() + 1
@@ -309,7 +308,6 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					// then calculate the rate(%) of included blob
 					// but we need to have a min_rate first so we run test
 					// and log obtained rates(%) and find the min
-					t.Logf("Transaction Included: %d", len(resp.Txs))
 					valid_blob := len(resp.Txs) - sendTxCount
 					incl_rate := float64(valid_blob) / float64(n_blob)
 					///* We need this to determine the min rate of included blob
