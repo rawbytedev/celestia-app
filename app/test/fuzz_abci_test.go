@@ -175,6 +175,12 @@ func TestPrepareProposalConsistency(t *testing.T) {
 	}
 }
 
+
+// TestPrepareProposalInclusion produces blocks with random data using
+// PrepareProposal and then tests those blocks by calling ProcessProposal.
+// It ensure the inclusion rate of blob in a block is constant
+// we use both randomblobs and constant size PFB transaction to test the inclusion rate
+// not all randomblobs produced will get included but constant size PFB transactions will get included
 func TestPrepareProposalInclusion(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping TestPrepareProposalInclusion in short mode.")
@@ -192,11 +198,14 @@ func TestPrepareProposalInclusion(t *testing.T) {
 		iterations             int
 	}
 	tests := []test{
-    // list of test for Inclusion
-	{"many single share multi-blob transactions", 1000, 100, 256, 1},
-	{"many small single share single blob transactions", 1000, 1, 256, 1},
-}
-
+		// running these tests more than once in CI will sometimes timeout, so we
+		// have to run them each once per square size. However, we can run these
+		// more locally by increasing the iterations.
+		{"many small single share single blob transactions", 1000, 1, 400, 1},
+		{"one hundred normal sized single blob transactions", 100, 1, 400000, 1},
+		{"many single share multi-blob transactions", 1000, 100, 400, 1},
+		{"one hundred normal sized multi-blob transactions", 100, 4, 400000, 1},
+	}
 
 	type testSize struct {
 		name             string
@@ -235,14 +244,19 @@ func TestPrepareProposalInclusion(t *testing.T) {
 		cparams.Block.MaxBytes = size.maxBytes
 
 		testApp, kr := testutil.SetupTestAppWithGenesisValSet(cparams, accounts...)
-
+		const_size := 100
+		const_count := 4
 		sendTxCount := 100
 
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				// repeat and generate PFB each time
 				for i := 0; i < tt.iterations; i++ {
-					txs := generatePayForBlobTransactions(
+					// I guess it tries to include as much txs as possible per block
+					// so most txs generated here are excluded
+					// half accounts are used for first Blob txs
+					half := tt.count / 2
+					txs := testutil.RandBlobTxsWithAccounts(
 						t,
 						testApp,
 						enc.TxConfig,
@@ -251,12 +265,31 @@ func TestPrepareProposalInclusion(t *testing.T) {
 						tt.count,
 						true,
 						testutil.ChainID,
-						accounts[:tt.count],
+						accounts[:half],
 						user.SetGasLimitAndGasPrice(1_000_000_000, 0.1),
 					)
+					// here lightweight PFB txs so most of them get included
+					// the other half produce PFB lightweight txs
+					// adding more varying input for count and size would make it better
+					// but we only want have a constant inclusion rate
+					txs2 := generatePayForBlobTransactions(
+						t,
+						testApp,
+						enc.TxConfig,
+						kr,
+						const_size,
+						const_count,
+						true,
+						testutil.ChainID,
+						accounts[half:],
+						user.SetGasLimitAndGasPrice(1_000_000_000, 0.1),
+					)
+					txs = append(txs, txs2...)
 					// keep tab of blob
 					n_blob := len(txs)
-					
+					// blob produced must be equal number of account
+					// since each account create a single PFB
+					require.Equal(t, n_blob, len(accounts))
 
 					// create 100 send transactions
 					sendTxs := testutil.SendTxsWithAccounts(
@@ -294,13 +327,12 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					},
 					)
 					require.NoError(t, err)
-
 					require.Equal(t, abci.ResponseProcessProposal_ACCEPT, res.Status)
 					// At least all of the send transactions and one blob tx
 					// should make it into the block. This should be expected to
 					// change if PFB transactions are not separated and put into
 					// their own namespace
-					//require.GreaterOrEqual(t, len(resp.Txs), sendTxCount+1)
+					require.GreaterOrEqual(t, len(resp.Txs), sendTxCount+1)
 					// at this point valid 100 valid txs and 1 blob
 					// we check the amount of blob that made it into block
 
@@ -323,7 +355,6 @@ func TestPrepareProposalInclusion(t *testing.T) {
 
 // generatePayForBlobTransactions creates a number of valid PFB txs
 // for accounts
-// We try to make sure it integrates nicely without breaking anything
 func generatePayForBlobTransactions(
 	t *testing.T,
 	testApp *app.App,
@@ -355,7 +386,7 @@ func generatePayForBlobTransactions(
 			require.NoError(t, err)
 			blobs[i] = blob
 		}
-		// create blobs per account
+		// create PFB tx per account
 		tx, _, err := signer.CreatePayForBlobs(account.Name(), blobs, opts...)
 		require.NoError(t, err)
 		rawTxs = append(rawTxs, tx)
