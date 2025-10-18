@@ -352,7 +352,7 @@ func generatePayForBlobTransactions(
 	minsize int,
 	maxs int,
 	blobcount int,
-	rand bool, 
+	randomize bool, 
 	chainid string,
 	accounts []string,
 	extraOpts ...user.TxOption,
@@ -368,24 +368,24 @@ func generatePayForBlobTransactions(
 		signer, err := user.NewSigner(kr, cfg, chainid, account)
 		require.NoError(t, err)
 		var count, size int
-		if rand{
+		if randomize{
 			count = randInRange(1, blobcount)
 			size = randInRange(minsize, maxs)
 		}else{
-			if minsize < 0{
+			if minsize < 0 {
 				size = minsize
-			}else{
+			} else {
 				size = 1
 			}
-			if blobcount<0{
+			if blobcount < 0 {
 				count = blobcount
-			}else{
+			} else {
 				count = 1
 			}
 		}
 		blobs := make([]*share.Blob, count)
 		randomBytes := crypto.CRandBytes(size)
-		for i := range count {
+		for i := 0; i < count; i++t {
 			blob, err := share.NewBlob(share.RandomNamespace(), randomBytes, 1, acc.GetAddress().Bytes())
 			require.NoError(t, err)
 			blobs[i] = blob
