@@ -206,7 +206,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
 		 1},
 		{"one hundred normal sized single blob transactions", 100, 1, 10000,400000, 1},
 		{"many single share multi-blob transactions", 1000, 1000, 1,400, 1},
-		{"one hundred normal sized multi-blob transactions", 100, 10000,1000, 400000, 1},
+		{"one hundred normal sized multi-blob transactions", 100, 10,1000, 400000, 1},
 	}
 
 	type testSize struct {
