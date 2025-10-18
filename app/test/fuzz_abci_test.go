@@ -266,7 +266,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
 						tt.minsize,
 						tt.maxsize,
 						tt.blobCount,
-						false,
+						true,
 						testutil.ChainID,
 						accounts[:tt.count],
 						user.SetGasLimitAndGasPrice(1_000_000_000, 0.1),
