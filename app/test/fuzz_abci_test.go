@@ -275,7 +275,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					n_blob := len(txs)
 					// blob produced must be equal number of account
 					// since each account create a single PFB
-					require.Equal(t, n_blob, len(accounts))
+					require.Equal(t, n_blob, len(accounts[:tt.count]))
 
 					// create 100 send transactions
 					sendTxs := testutil.SendTxsWithAccounts(
