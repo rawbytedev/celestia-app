@@ -331,7 +331,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					// and log obtained rates(%) and find the min
 					valid_blob := len(resp.Txs) - sendTxCount
 
-					incl_rate := float64(valid_blob) / float64(n_blob
+					incl_rate := float64(valid_blob) / float64(n_blob)
 					require.GreaterOrEqual(t, incl_rate, tt.rate)
 				}
 			})
