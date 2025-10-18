@@ -204,7 +204,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
 		{"many small single share single blob transactions", 500, 1, 0,400, 1},
 		{"one hundred normal sized single blob transactions", 100, 1, 10000,400000, 1},
 		{"many single share multi-blob transactions", 1000, 1000, 0,400, 1},
-		{"one hundred normal sized multi-blob transactions", 100, 1000, 400000, 1},
+		{"one hundred normal sized multi-blob transactions", 100, 10000,1000, 400000, 1},
 	}
 
 	type testSize struct {
@@ -365,12 +365,13 @@ func generatePayForBlobTransactions(
 		account := user.NewAccount(accounts[i], acc.GetAccountNumber(), accountSequence)
 		signer, err := user.NewSigner(kr, cfg, chainid, account)
 		require.NoError(t, err)
+		var count, size int
 		if rand{
-			count := randInRange(0, blobcount)
-			size := randInRange(minsize, maxs)
+			count = randInRange(0, blobcount)
+			size = randInRange(minsize, maxs)
 		}else{
-			count := blobcount
-			size := minsize
+			count = blobcount
+			size = minsize
 		}
 		blobs := make([]*share.Blob, count)
 		randomBytes := crypto.CRandBytes(size)
