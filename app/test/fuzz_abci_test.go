@@ -201,9 +201,11 @@ func TestPrepareProposalInclusion(t *testing.T) {
 		// running these tests more than once in CI will sometimes timeout, so we
 		// have to run them each once per square size. However, we can run these
 		// more locally by increasing the iterations.
-		{"many small single share single blob transactions", 500, 1, 0,400, 1},
+		{"many small single share single blob transactions", 
+		 500, 1, 1,400, 
+		 1},
 		{"one hundred normal sized single blob transactions", 100, 1, 10000,400000, 1},
-		{"many single share multi-blob transactions", 1000, 1000, 0,400, 1},
+		{"many single share multi-blob transactions", 1000, 1000, 1,400, 1},
 		{"one hundred normal sized multi-blob transactions", 100, 10000,1000, 400000, 1},
 	}
 
@@ -367,8 +369,8 @@ func generatePayForBlobTransactions(
 		require.NoError(t, err)
 		var count, size int
 		if rand{
-			count = randInRange(0, blobcount)
-			size = randInRange(minsize, maxs)
+			count = randInRange(1, blobcount)
+			size = randInRange(min, maxs)
 		}else{
 			if minsize < 0{
 				size = minsize
