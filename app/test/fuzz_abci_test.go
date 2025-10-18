@@ -385,7 +385,7 @@ func generatePayForBlobTransactions(
 		}
 		blobs := make([]*share.Blob, count)
 		randomBytes := crypto.CRandBytes(size)
-		for i := 0; i < count; i++t {
+		for i := 0; i < count; i++ {
 			blob, err := share.NewBlob(share.RandomNamespace(), randomBytes, 1, acc.GetAddress().Bytes())
 			require.NoError(t, err)
 			blobs[i] = blob
