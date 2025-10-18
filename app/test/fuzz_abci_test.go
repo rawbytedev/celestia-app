@@ -370,8 +370,16 @@ func generatePayForBlobTransactions(
 			count = randInRange(0, blobcount)
 			size = randInRange(minsize, maxs)
 		}else{
-			count = blobcount
-			size = minsize
+			if minsize < 0{
+				size = minsize
+			}else{
+				size = 1
+			}
+			if blobcount<0{
+				count = blobcount
+			}else{
+				count = 1
+			}
 		}
 		blobs := make([]*share.Blob, count)
 		randomBytes := crypto.CRandBytes(size)
