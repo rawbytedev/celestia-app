@@ -375,7 +375,7 @@ func generatePayForBlobTransactions(
 				size = 1
 			}
 			if blobcount < 0 {
-				count = blobcount
+				count = randInRange(1, blobcount)
 			} else {
 				count = 1
 			}
