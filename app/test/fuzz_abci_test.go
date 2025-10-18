@@ -373,7 +373,7 @@ func generatePayForBlobTransactions(
 			size = randInRange(minsize, maxs)
 		}else{
 			if minsize < 0 {
-				size = minsize
+				size = maxs
 			} else {
 				size = 1
 			}
