@@ -3,7 +3,7 @@ package app_test
 import (
 	"testing"
 	"time"
-
+	"math/rand"
 	"github.com/celestiaorg/celestia-app/v6/app"
 	"github.com/celestiaorg/celestia-app/v6/app/encoding"
 	"github.com/celestiaorg/celestia-app/v6/pkg/appconsts"
@@ -194,17 +194,17 @@ func TestPrepareProposalInclusion(t *testing.T) {
 
 	type test struct {
 		name                   string
-		count, blobCount, size int
+		count, blobCount, minsize, maxsize int
 		iterations             int
 	}
 	tests := []test{
 		// running these tests more than once in CI will sometimes timeout, so we
 		// have to run them each once per square size. However, we can run these
 		// more locally by increasing the iterations.
-		{"many small single share single blob transactions", 1000, 1, 400, 1},
-		{"one hundred normal sized single blob transactions", 100, 1, 400000, 1},
-		{"many single share multi-blob transactions", 1000, 100, 400, 1},
-		{"one hundred normal sized multi-blob transactions", 100, 4, 400000, 1},
+		{"many small single share single blob transactions", 500, 1, 0,400, 1},
+		{"one hundred normal sized single blob transactions", 100, 1, 10000,400000, 1},
+		{"many single share multi-blob transactions", 1000, 1000, 0,400, 1},
+		{"one hundred normal sized multi-blob transactions", 100, 1000, 400000, 1},
 	}
 
 	type testSize struct {
@@ -255,37 +255,25 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					// I guess it tries to include as much txs as possible per block
 					// so most txs generated here are excluded
 					// half accounts are used for first Blob txs
-					half := tt.count / 2
-					txs := testutil.RandBlobTxsWithAccounts(
-						t,
-						testApp,
-						enc.TxConfig,
-						kr,
-						tt.size,
-						tt.count,
-						true,
-						testutil.ChainID,
-						accounts[:half],
-						user.SetGasLimitAndGasPrice(1_000_000_000, 0.1),
-					)
 					// here lightweight PFB txs so most of them get included
 					// the other half produce PFB lightweight txs
 					// adding more varying input for count and size would make it better
 					// but we only want have a constant inclusion rate
-					txs2 := generatePayForBlobTransactions(
+					// keep tab of blob
+					txs := generatePayForBlobTransactions(
 						t,
 						testApp,
 						enc.TxConfig,
 						kr,
-						const_size,
-						const_count,
-						true,
+						tt.minsize,
+						tt.maxsize,
+						tt.blobCount,
+						false,
 						testutil.ChainID,
-						accounts[half:],
+						accounts[:tt.count],
 						user.SetGasLimitAndGasPrice(1_000_000_000, 0.1),
 					)
-					txs = append(txs, txs2...)
-					// keep tab of blob
+					
 					n_blob := len(txs)
 					// blob produced must be equal number of account
 					// since each account create a single PFB
@@ -361,9 +349,10 @@ func generatePayForBlobTransactions(
 	testApp *app.App,
 	cfg client.TxConfig,
 	kr keyring.Keyring,
-	size int,
-	count int,
-	_ bool, // not sure about supporting randsize
+	minsize int,
+	maxs int,
+	blobcount int,
+	rand bool, 
 	chainid string,
 	accounts []string,
 	extraOpts ...user.TxOption,
@@ -379,9 +368,15 @@ func generatePayForBlobTransactions(
 		account := user.NewAccount(accounts[i], acc.GetAccountNumber(), accountSequence)
 		signer, err := user.NewSigner(kr, cfg, chainid, account)
 		require.NoError(t, err)
-		randomBytes := crypto.CRandBytes(size)
+		if rand{
+			count := randInRange(0, blobcount)
+			size := randInRange(minsize, maxs)
+		}else{
+			count := blobcount
+			size := minsize
+		}
 		blobs := make([]*share.Blob, count)
-
+		randomBytes := crypto.CRandBytes(size)
 		for i := range count {
 			blob, err := share.NewBlob(share.RandomNamespace(), randomBytes, 1, acc.GetAddress().Bytes())
 			require.NoError(t, err)
@@ -395,4 +390,9 @@ func generatePayForBlobTransactions(
 	}
 
 	return rawTxs
+}
+
+// generate random numbers in specified range
+func randInRange(min, max int) int {
+    return rand.Intn(max-min+1) + min
 }
