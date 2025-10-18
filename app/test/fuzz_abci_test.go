@@ -196,6 +196,7 @@ func TestPrepareProposalInclusion(t *testing.T) {
 		name                   string
 		count, blobCount, minsize, maxsize int
 		iterations             int
+		rate float64
 	}
 	tests := []test{
 		// running these tests more than once in CI will sometimes timeout, so we
@@ -203,10 +204,10 @@ func TestPrepareProposalInclusion(t *testing.T) {
 		// more locally by increasing the iterations.
 		{"many small single share single blob transactions", 
 		 500, 1, 1,400, 
-		 1},
-		{"one hundred normal sized single blob transactions", 100, 1, 10000,400000, 1},
-		{"many single share multi-blob transactions", 1000, 1000, 1,400, 1},
-		{"one hundred normal sized multi-blob transactions", 100, 10,1000, 400000, 1},
+		 1, 0.04},
+		{"one hundred normal sized single blob transactions", 100, 1, 10000,400000, 1, 0.1},
+		{"many single share multi-blob transactions", 1000, 1000, 1,400, 1, 0.02},
+		{"one hundred normal sized multi-blob transactions", 100, 10,1000, 400000, 1, 0.1},
 	}
 
 	type testSize struct {
@@ -329,13 +330,9 @@ func TestPrepareProposalInclusion(t *testing.T) {
 					// but we need to have a min_rate first so we run test
 					// and log obtained rates(%) and find the min
 					valid_blob := len(resp.Txs) - sendTxCount
-					t.Logf("transaction count:%d, valid blob: %d, n_blob: %d",len(resp.Txs), valid_blob, n_blob)
-					incl_rate := float64(valid_blob) / float64(n_blob)
-					///* We need this to determine the min rate of included blob
-					t.Logf("included blob: %2.f %%", incl_rate*100)
-					//*/
-					//min_rate := 50 / 100 // the min_rate goes here after testings
-					//require.GreaterOrEqual(t, min_rate, incl_rate)
+
+					incl_rate := float64(valid_blob) / float64(n_blob
+					require.GreaterOrEqual(t, incl_rate, tt.rate)
 				}
 			})
 		}
