@@ -244,8 +244,6 @@ func TestPrepareProposalInclusion(t *testing.T) {
 		cparams.Block.MaxBytes = size.maxBytes
 
 		testApp, kr := testutil.SetupTestAppWithGenesisValSet(cparams, accounts...)
-		const_size := 100
-		const_count := 4
 		sendTxCount := 100
 
 		for _, tt := range tests {
@@ -358,8 +356,7 @@ func generatePayForBlobTransactions(
 	extraOpts ...user.TxOption,
 ) []coretypes.Tx {
 	opts := append(blobfactory.DefaultTxOpts(), extraOpts...)
-	require.Greater(t, size, 0)
-	require.Greater(t, count, 0) // neeed to remove it
+	require.Greater(t, blobcount, 0) // neeed to remove it
 	rawTxs := make([]coretypes.Tx, 0, len(accounts))
 	for i := range accounts {
 		addr := testfactory.GetAddress(kr, accounts[i])
