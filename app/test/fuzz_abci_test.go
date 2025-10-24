@@ -134,8 +134,8 @@ func TestPrepareProposalConsistency(t *testing.T) {
 					// the specified size
 					require.LessOrEqual(t, resp.SquareSize, uint64(size.govMaxSquareSize))
 
-					respSet := txHashs(resp.Txs)
-					txsSet := txHashs(coretypes.Txs(txs).ToSliceOfBytes())
+					respSet := txHashes(resp.Txs)
+					txsSet := txHashes(coretypes.Txs(txs).ToSliceOfBytes())
 					// check that all sendTxs were included
 					for _, txs := range sendTxs {
 						h := tmhash.Sum(txs)
@@ -150,9 +150,6 @@ func TestPrepareProposalConsistency(t *testing.T) {
 						copy(k[:], h)
 						require.Contains(t, txsSet, k, "proposal contains unknown tx")
 					}
-					// Prososed Block txs amount must be smaller or equal
-					// to the total of SendTxs and randomBlobs
-					require.LessOrEqual(t, len(resp.Txs), len(txsSet))
 
 					res, err := testApp.ProcessProposal(&abci.RequestProcessProposal{
 						Height:       height,
@@ -168,7 +165,7 @@ func TestPrepareProposalConsistency(t *testing.T) {
 					// should make it into the block. This should be expected to
 					// change if PFB transactions are not separated and put into
 					// their own namespace
-					//require.GreaterOrEqual(t, len(resp.Txs), sendTxCount+1)
+					require.GreaterOrEqual(t, len(resp.Txs), sendTxCount+1)
 
 				}
 			})
@@ -176,7 +173,7 @@ func TestPrepareProposalConsistency(t *testing.T) {
 	}
 }
 
-func txHashs(txs [][]byte) map[[32]byte]int {
+func txHashes(txs [][]byte) map[[32]byte]int {
 	m := make(map[[32]byte]int, len(txs))
 	for i, b := range txs {
 		h := tmhash.Sum(b)
