@@ -22,4 +22,4 @@ jobs:
           go-version: "1.24"
 
       - name: Run tests
-        run: go test -v ./app/test -run ^TestPrepareProposalInclusion$
+        run: go test -v ./app/test -run ^TestPrepareProposalConsistency$
